@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>실시간 주식 정보</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <div class="app-layout">
+      <!-- 왼쪽 사이드바 -->
+      <aside class="sidebar">
+        <header>
+          <h1>📈 주식 정보</h1>
+          <p class="subtitle">종목코드 또는 종목명을 입력하세요</p>
+        </header>
+
+        <div class="search-section">
+          <form id="searchForm">
+            <div class="search-box">
+              <input
+                type="text"
+                id="stockInput"
+                placeholder="예: 삼성전자, 005930"
+                autocomplete="off"
+                autofocus
+              />
+              <button type="submit" class="search-btn">검색</button>
+            </div>
+            <div class="search-hint">
+              💡 종목코드 예시: 삼성전자(005930), SK하이닉스(000660),
+              NAVER(035420)
+            </div>
+          </form>
+        </div>
+
+        <!-- 오늘의 추천 주식 -->
+        <div class="recommended-section">
+          <h3 class="recommended-title">🔥 급등 종목 TOP 5</h3>
+          <div id="recommendedStocks" class="recommended-stocks">
+            <div class="recommended-loading">
+              <div class="spinner-small"></div>
+            </div>
+          </div>
+        </div>
+
+        <div id="stockTabs" class="stock-tabs"></div>
+      </aside>
+
+      <!-- 메인 컨텐츠 영역 -->
+      <main class="main-content">
+        <!-- 웰컴 스크린 -->
+        <div id="welcomeScreen" class="welcome-screen">
+          <div class="welcome-content">
+            <h2 class="welcome-title">📊 주식 정보 분석</h2>
+            <p class="welcome-subtitle">AI 기반 투자 분석 서비스</p>
+
+            <div class="welcome-features">
+              <div class="feature-card">
+                <div class="feature-icon">📈</div>
+                <h3>전일 시세</h3>
+                <p>공공데이터 API 기반 정확한 주식 시세 정보</p>
+              </div>
+
+              <div class="feature-card">
+                <div class="feature-icon">📉</div>
+                <h3>차트 분석</h3>
+                <p>10개월치 데이터로 추세 파악 및 확대/축소 가능</p>
+              </div>
+
+              <div class="feature-card">
+                <div class="feature-icon">🤖</div>
+                <h3>AI 투자 분석</h3>
+                <p>Gemini AI가 제공하는 종목 분석 및 전망</p>
+              </div>
+
+              <div class="feature-card">
+                <div class="feature-icon">🔥</div>
+                <h3>급등 종목</h3>
+                <p>등락률 20% 이상 급등 종목 TOP 5 추천</p>
+              </div>
+            </div>
+
+            <div class="welcome-guide">
+              <p class="guide-text">👈 왼쪽에서 종목을 검색하거나 급등 종목을 클릭해보세요!</p>
+            </div>
+          </div>
+        </div>
+
+        <div id="stockInfo" class="stock-info hidden">
+        <div class="stock-header">
+          <div class="stock-title">
+            <h2 id="stockName">-</h2>
+            <span id="stockCode" class="stock-code">-</span>
+          </div>
+          <button id="closeBtn" class="close-btn">✕</button>
+        </div>
+
+        <div class="price-section">
+          <div class="current-price">
+            <span class="label">현재가</span>
+            <span id="currentPrice" class="price">-</span>
+            <span id="priceChange" class="change">-</span>
+            <span id="changeRate" class="change-rate">-</span>
+          </div>
+        </div>
+
+        <div class="info-grid">
+          <div class="info-item">
+            <span class="info-label">시가</span>
+            <span id="openPrice" class="info-value">-</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">고가</span>
+            <span id="highPrice" class="info-value">-</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">저가</span>
+            <span id="lowPrice" class="info-value">-</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">거래량</span>
+            <span id="volume" class="info-value">-</span>
+          </div>
+        </div>
+
+        <!-- 탭 네비게이션 -->
+        <div class="content-tabs">
+          <button class="content-tab active" data-tab="chart">📊 차트</button>
+          <button class="content-tab" data-tab="analysis">🤖 AI 분석</button>
+        </div>
+
+        <!-- 탭 컨텐츠 -->
+        <div class="tab-content-wrapper">
+          <!-- 차트 탭 -->
+          <div id="chartTab" class="tab-content active">
+            <div class="chart-controls">
+              <button class="chart-btn active" data-period="D">일간</button>
+              <button class="chart-btn" data-period="W">주간</button>
+              <button class="chart-btn" data-period="M">월간</button>
+              <button id="resetZoomBtn" class="chart-btn reset-btn">🔍 리셋</button>
+            </div>
+            <canvas id="stockChart"></canvas>
+          </div>
+
+          <!-- AI 분석 탭 -->
+          <div id="analysisTab" class="tab-content">
+            <div class="analysis-header">
+              <h3>🤖 AI 투자 분석</h3>
+            </div>
+            <div id="analysisContent" class="analysis-content">
+              <div id="analysisText" class="analysis-text"></div>
+            </div>
+            <div id="analysisLoading" class="loading">
+              <div class="spinner"></div>
+              <p>AI가 분석 중입니다...</p>
+            </div>
+          </div>
+        </div>
+
+        <div id="error" class="error hidden"></div>
+        </div>
+
+        <!-- 로딩 오버레이 (stockInfo 밖에 위치) -->
+        <div id="loading" class="loading-overlay hidden">
+          <div class="loading-content">
+            <div class="spinner"></div>
+            <p>데이터를 불러오는 중...</p>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-financial"></script>
+    <script src="https://cdn.jsdelivr.net/npm/luxon"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-luxon"></script>
+    <script src="/app.js"></script>
+  </body>
+</html>

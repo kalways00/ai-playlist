@@ -1,0 +1,14 @@
+name = "ai-playlist"
+compatibility_date = "2024-01-01"
+main = "src/index.ts"
+
+# Cloudflare Workers compatibility flags
+compatibility_flags = ["nodejs_compat"]
+
+# 정적 파일 서빙
+[assets]
+directory = "./public"
+binding = "ASSETS"
+
+[vars]
+# Environment variables (add DATA_GO_KR_API_KEY via Cloudflare dashboard or .dev.vars)
