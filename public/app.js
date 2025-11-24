@@ -5,6 +5,7 @@ let activeStock = null;
 
 // 로컬 스토리지 키
 const STORAGE_KEY = 'stock_analysis_cache';
+const RECOMMENDED_STOCKS_KEY = 'recommended_stocks_cache';
 
 // DOM 요소
 const searchForm = document.getElementById('searchForm');
@@ -566,9 +567,61 @@ function formatVolume(volume) {
   return volume.toLocaleString();
 }
 
+// 추천 주식 캐시에서 가져오기
+function getCachedRecommendedStocks() {
+  try {
+    const cached = JSON.parse(localStorage.getItem(RECOMMENDED_STOCKS_KEY) || 'null');
+
+    if (!cached) {
+      return null;
+    }
+
+    // 오늘 날짜 확인
+    const today = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
+
+    // 저장된 날짜와 오늘 날짜가 다르면 캐시 무효화
+    if (cached.date !== today) {
+      localStorage.removeItem(RECOMMENDED_STOCKS_KEY);
+      return null;
+    }
+
+    return cached.stocks;
+  } catch (e) {
+    return null;
+  }
+}
+
+// 추천 주식 캐시에 저장
+function saveRecommendedStocksToCache(stocks) {
+  try {
+    const today = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
+
+    const cacheData = {
+      stocks: stocks,
+      date: today
+    };
+
+    localStorage.setItem(RECOMMENDED_STOCKS_KEY, JSON.stringify(cacheData));
+  } catch (e) {
+    console.error('Failed to save recommended stocks to cache:', e);
+  }
+}
+
 // 추천 주식 로드
 async function loadRecommendedStocks() {
   const recommendedStocksEl = document.getElementById('recommendedStocks');
+
+  // 캐시된 데이터 확인
+  const cachedStocks = getCachedRecommendedStocks();
+
+  if (cachedStocks) {
+    console.log('Loading recommended stocks from cache');
+    displayRecommendedStocks(cachedStocks, recommendedStocksEl);
+    return;
+  }
+
+  // 캐시가 없으면 API 호출
+  console.log('Fetching recommended stocks from API');
 
   try {
     const response = await fetch('/api/recommended');
@@ -580,32 +633,11 @@ async function loadRecommendedStocks() {
     const data = await response.json();
 
     if (data.stocks && data.stocks.length > 0) {
-      // 모든 종목 표시
-      recommendedStocksEl.innerHTML = data.stocks.map((stock, index) => `
-        <div class="recommended-stock" data-stock-name="${stock.name}">
-          <div style="display: flex; align-items: center; margin-bottom: 4px;">
-            <span class="recommended-rank">${index + 1}</span>
-            <div style="flex: 1;">
-              <div class="recommended-name">${stock.name}</div>
-              <div class="recommended-code">${stock.code}</div>
-            </div>
-          </div>
-          <div class="recommended-reason">
-            💡 ${stock.reason || '시장 상황에 따른 급등'}<br>
-            🔥 등락률: <strong style="color: #e74c3c;">+${stock.growthRate}%</strong><br>
-            💰 현재가: ${formatPrice(stock.currentPrice)}
-          </div>
-        </div>
-      `).join('');
+      // 캐시에 저장
+      saveRecommendedStocksToCache(data.stocks);
 
-      // 클릭 이벤트 추가
-      document.querySelectorAll('.recommended-stock').forEach(stockEl => {
-        stockEl.addEventListener('click', () => {
-          const stockName = stockEl.dataset.stockName;
-          stockInput.value = stockName;
-          handleSearch({ preventDefault: () => {} });
-        });
-      });
+      // 화면에 표시
+      displayRecommendedStocks(data.stocks, recommendedStocksEl);
     } else {
       recommendedStocksEl.innerHTML = `
         <div style="text-align: center; color: #666; padding: 20px; font-size: 13px;">
@@ -621,6 +653,36 @@ async function loadRecommendedStocks() {
       </div>
     `;
   }
+}
+
+// 추천 주식 표시
+function displayRecommendedStocks(stocks, containerEl) {
+  // 모든 종목 표시
+  containerEl.innerHTML = stocks.map((stock, index) => `
+    <div class="recommended-stock" data-stock-name="${stock.name}">
+      <div style="display: flex; align-items: center; margin-bottom: 4px;">
+        <span class="recommended-rank">${index + 1}</span>
+        <div style="flex: 1;">
+          <div class="recommended-name">${stock.name}</div>
+          <div class="recommended-code">${stock.code}</div>
+        </div>
+      </div>
+      <div class="recommended-reason">
+        💡 ${stock.reason || '시장 상황에 따른 급등'}<br>
+        🔥 등락률: <strong style="color: #e74c3c;">+${stock.growthRate}%</strong><br>
+        💰 현재가: ${formatPrice(stock.currentPrice)}
+      </div>
+    </div>
+  `).join('');
+
+  // 클릭 이벤트 추가
+  document.querySelectorAll('.recommended-stock').forEach(stockEl => {
+    stockEl.addEventListener('click', () => {
+      const stockName = stockEl.dataset.stockName;
+      stockInput.value = stockName;
+      handleSearch({ preventDefault: () => {} });
+    });
+  });
 }
 
 // 페이지 로드 시 추천 주식 로드
