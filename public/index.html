@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>실시간 주식 정보</title>
+    <title>주식 정보</title>
     <link rel="stylesheet" href="/styles.css" />
   </head>
   <body>
@@ -82,83 +82,87 @@
             </div>
 
             <div class="welcome-guide">
-              <p class="guide-text">👈 왼쪽에서 종목을 검색하거나 급등 종목을 클릭해보세요!</p>
+              <p class="guide-text">
+                👈 왼쪽에서 종목을 검색하거나 급등 종목을 클릭해보세요!
+              </p>
             </div>
           </div>
         </div>
 
         <div id="stockInfo" class="stock-info hidden">
-        <div class="stock-header">
-          <div class="stock-title">
-            <h2 id="stockName">-</h2>
-            <span id="stockCode" class="stock-code">-</span>
-          </div>
-          <button id="closeBtn" class="close-btn">✕</button>
-        </div>
-
-        <div class="price-section">
-          <div class="current-price">
-            <span class="label">현재가</span>
-            <span id="currentPrice" class="price">-</span>
-            <span id="priceChange" class="change">-</span>
-            <span id="changeRate" class="change-rate">-</span>
-          </div>
-        </div>
-
-        <div class="info-grid">
-          <div class="info-item">
-            <span class="info-label">시가</span>
-            <span id="openPrice" class="info-value">-</span>
-          </div>
-          <div class="info-item">
-            <span class="info-label">고가</span>
-            <span id="highPrice" class="info-value">-</span>
-          </div>
-          <div class="info-item">
-            <span class="info-label">저가</span>
-            <span id="lowPrice" class="info-value">-</span>
-          </div>
-          <div class="info-item">
-            <span class="info-label">거래량</span>
-            <span id="volume" class="info-value">-</span>
-          </div>
-        </div>
-
-        <!-- 탭 네비게이션 -->
-        <div class="content-tabs">
-          <button class="content-tab active" data-tab="chart">📊 차트</button>
-          <button class="content-tab" data-tab="analysis">🤖 AI 분석</button>
-        </div>
-
-        <!-- 탭 컨텐츠 -->
-        <div class="tab-content-wrapper">
-          <!-- 차트 탭 -->
-          <div id="chartTab" class="tab-content active">
-            <div class="chart-controls">
-              <button class="chart-btn active" data-period="D">일간</button>
-              <button class="chart-btn" data-period="W">주간</button>
-              <button class="chart-btn" data-period="M">월간</button>
-              <button id="resetZoomBtn" class="chart-btn reset-btn">🔍 리셋</button>
+          <div class="stock-header">
+            <div class="stock-title">
+              <h2 id="stockName">-</h2>
+              <span id="stockCode" class="stock-code">-</span>
             </div>
-            <canvas id="stockChart"></canvas>
+            <button id="closeBtn" class="close-btn">✕</button>
           </div>
 
-          <!-- AI 분석 탭 -->
-          <div id="analysisTab" class="tab-content">
-            <div class="analysis-header">
-              <h3>🤖 AI 투자 분석</h3>
-            </div>
-            <div id="analysisContent" class="analysis-content">
-              <div id="analysisText" class="analysis-text"></div>
-            </div>
-            <div id="analysisLoading" class="loading">
-              <div class="spinner"></div>
-              <p>AI가 분석 중입니다...</p>
+          <div class="price-section">
+            <div class="current-price">
+              <span class="label">현재가</span>
+              <span id="currentPrice" class="price">-</span>
+              <span id="priceChange" class="change">-</span>
+              <span id="changeRate" class="change-rate">-</span>
             </div>
           </div>
-        </div>
 
-        <div id="error" class="error hidden"></div>
+          <div class="info-grid">
+            <div class="info-item">
+              <span class="info-label">시가</span>
+              <span id="openPrice" class="info-value">-</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">고가</span>
+              <span id="highPrice" class="info-value">-</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">저가</span>
+              <span id="lowPrice" class="info-value">-</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">거래량</span>
+              <span id="volume" class="info-value">-</span>
+            </div>
+          </div>
+
+          <!-- 탭 네비게이션 -->
+          <div class="content-tabs">
+            <button class="content-tab active" data-tab="chart">📊 차트</button>
+            <button class="content-tab" data-tab="analysis">🤖 AI 분석</button>
+          </div>
+
+          <!-- 탭 컨텐츠 -->
+          <div class="tab-content-wrapper">
+            <!-- 차트 탭 -->
+            <div id="chartTab" class="tab-content active">
+              <div class="chart-controls">
+                <button class="chart-btn active" data-period="D">일간</button>
+                <button class="chart-btn" data-period="W">주간</button>
+                <button class="chart-btn" data-period="M">월간</button>
+                <button id="resetZoomBtn" class="chart-btn reset-btn">
+                  🔍 리셋
+                </button>
+              </div>
+              <canvas id="stockChart"></canvas>
+            </div>
+
+            <!-- AI 분석 탭 -->
+            <div id="analysisTab" class="tab-content">
+              <div class="analysis-header">
+                <h3>🤖 AI 투자 분석</h3>
+              </div>
+              <div id="analysisContent" class="analysis-content">
+                <div id="analysisText" class="analysis-text"></div>
+              </div>
+              <div id="analysisLoading" class="loading">
+                <div class="spinner"></div>
+                <p>AI가 분석 중입니다...</p>
+              </div>
+            </div>
+          </div>
+
+          <div id="error" class="error hidden"></div>
         </div>
 
         <!-- 로딩 오버레이 (stockInfo 밖에 위치) -->
